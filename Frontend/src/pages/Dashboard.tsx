@@ -7,15 +7,57 @@ import {
   Text,
 } from "@chakra-ui/react";
 
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StatCard from "../components/StatCard";
 import TopicProgress from "../components/TopicProgress";
 import RevisionDue from "../components/RevisionDue";
 import RecentQuestions from "../components/RecentQuestions";
 
+import { getQuestions } from "../services/Service";
+import type { Question } from "../types/questions";
+
 const Dashboard = () => {
+  const [questions, setQuestions] = useState<Question[]>([]);
+const navigate = useNavigate();
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        const data = await getQuestions();
+
+        console.log("Questions from MongoDB:", data);
+
+        setQuestions(data);
+      } catch (error) {
+        console.error("Failed to fetch questions:", error);
+      }
+    };
+
+    fetchQuestions();
+  }, []);
+
+  // Calculate dashboard statistics
+  const totalQuestions = questions.length;
+
+  const solvedQuestions = questions.filter(
+    (question) => question.status === "Solved"
+  ).length;
+
+  const inProgressQuestions = questions.filter(
+    (question) => question.status === "In Progress"
+  ).length;
+
+  // Calculate solved percentage
+  const solvedPercentage =
+    totalQuestions > 0
+      ? Math.round((solvedQuestions / totalQuestions) * 100)
+      : 0;
+const handleClick = ()=>
+{
+
+}
   return (
     <Box>
-
       {/* Header */}
       <Flex
         justify="space-between"
@@ -29,17 +71,16 @@ const Dashboard = () => {
             Good morning, Hamna 👋
           </Heading>
 
-          <Text
-            color="gray.500"
-            mt="2"
-          >
+          <Text color="gray.500" mt="2">
             Track your interview preparation progress
           </Text>
         </Box>
-
-        <Button colorPalette="blue">
-          + Add Question
-        </Button>
+<Button
+  colorPalette="blue"
+  onClick={() => navigate("/add-question")}
+>
+  + Add Question
+</Button>
       </Flex>
 
       {/* Stats */}
@@ -53,19 +94,19 @@ const Dashboard = () => {
       >
         <StatCard
           title="Total Questions"
-          value="42"
+          value={String(totalQuestions)}
           description="Questions added"
         />
 
         <StatCard
           title="Solved"
-          value="24"
-          description="57% completed"
+          value={String(solvedQuestions)}
+          description={`${solvedPercentage}% completed`}
         />
 
         <StatCard
           title="In Progress"
-          value="10"
+          value={String(inProgressQuestions)}
           description="Keep going"
         />
 
@@ -75,23 +116,27 @@ const Dashboard = () => {
           description="Great consistency 🔥"
         />
       </Grid>
-<Flex
-  gap="5"
-  mt="6"
-  direction={{
-    base: "column",
-    lg: "row",
-  }}
->
-  <Box flex="1">
-    <TopicProgress/>
-  </Box>
 
-  <Box flex="1">
-    <RevisionDue/>
-  </Box>
-</Flex>
-<RecentQuestions/>
+      {/* Topic Progress + Revision Due */}
+      <Flex
+        gap="5"
+        mt="6"
+        direction={{
+          base: "column",
+          lg: "row",
+        }}
+      >
+        <Box flex="1">
+          <TopicProgress questions={questions} />
+        </Box>
+
+        <Box flex="1">
+          <RevisionDue questions={questions}/>
+        </Box>
+      </Flex>
+
+      {/* Recent Questions */}
+      <RecentQuestions questions={questions}/>
     </Box>
   );
 };

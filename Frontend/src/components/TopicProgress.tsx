@@ -4,72 +4,78 @@ import {
   Heading,
   Progress,
   Text,
-  VStack,
 } from "@chakra-ui/react";
 
+import type { Question } from "../types/questions";
+
+interface TopicProgressProps {
+  questions: Question[];
+}
+
 const topics = [
-  {
-    name: "React",
-    progress: 75,
-  },
-  {
-    name: "JavaScript",
-    progress: 60,
-  },
-  {
-    name: "DSA",
-    progress: 45,
-  },
-  {
-    name: "Node.js",
-    progress: 35,
-  },
+  "DSA",
+  "JavaScript",
+  "React",
+  "Node",
+  "Express",
+  "MongoDB",
+  "System Design",
 ];
 
-const TopicProgress = () => {
+const TopicProgress = ({ questions }: TopicProgressProps) => {
   return (
     <Box
       bg="white"
-      borderWidth="1px"
-      borderColor="gray.200"
-      borderRadius="xl"
       p="6"
-      shadow="sm"
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="gray.100"
     >
       <Heading size="md" mb="6">
         Topic Progress
       </Heading>
 
-      <VStack align="stretch" gap="5">
-        {topics.map((topic) => (
-          <Box key={topic.name}>
-            <Flex
-              justify="space-between"
-              mb="2"
-            >
-              <Text fontWeight="medium">
-                {topic.name}
-              </Text>
+      {topics.map((topic) => {
+        const topicQuestions = questions.filter(
+          (question) => question.topic === topic
+        );
 
-              <Text
-                fontSize="sm"
-                color="gray.500"
-              >
-                {topic.progress}%
+        const solvedQuestions = topicQuestions.filter(
+          (question) => question.status === "Solved"
+        );
+
+        const total = topicQuestions.length;
+        const solved = solvedQuestions.length;
+
+        const percentage =
+          total > 0 ? Math.round((solved / total) * 100) : 0;
+
+        return (
+          <Box key={topic} mb="5">
+            <Flex justify="space-between" mb="2">
+              <Text fontWeight="500">{topic}</Text>
+
+              <Text fontSize="sm" color="gray.500">
+                {solved} / {total}
               </Text>
             </Flex>
 
-            <Progress.Root
-              value={topic.progress}
-              size="sm"
-            >
+            <Progress.Root value={percentage}>
               <Progress.Track>
                 <Progress.Range />
               </Progress.Track>
             </Progress.Root>
+
+            <Text
+              fontSize="xs"
+              color="gray.500"
+              mt="1"
+            >
+              {percentage}% completed
+            </Text>
           </Box>
-        ))}
-      </VStack>
+        );
+      })}
     </Box>
   );
 };

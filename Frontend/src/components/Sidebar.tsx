@@ -6,8 +6,10 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   return (
     <Box
       w="250px"
@@ -55,6 +57,7 @@ const Sidebar = () => {
         <Button
           justifyContent="flex-start"
           variant="ghost"
+          onClick={() => navigate("/add-question")}
         >
           Add Question
         </Button>

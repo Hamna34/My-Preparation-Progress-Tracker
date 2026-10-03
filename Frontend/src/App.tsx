@@ -6,6 +6,7 @@ import {
 
 import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import AddQuestion from "./components/QuestionForm";
 
 const App = () => {
   return (
@@ -18,7 +19,10 @@ const App = () => {
             path="/"
             element={<Dashboard />}
           />
-
+<Route
+  path="/add-question"
+  element={<AddQuestion />}
+/>
         </Route>
 
       </Routes>
@@ -26,4 +30,4 @@ const App = () => {
   );
 };
 
-export default App;pro
+export default App;

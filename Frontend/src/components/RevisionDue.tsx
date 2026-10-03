@@ -4,74 +4,84 @@ import {
   Flex,
   Heading,
   Text,
-  VStack,
 } from "@chakra-ui/react";
 
-const revisions = [
-  {
-    title: "useMemo vs useCallback",
-    topic: "React",
-    due: "Today",
-  },
-  {
-    title: "Two Sum",
-    topic: "DSA",
-    due: "Tomorrow",
-  },
-  {
-    title: "JavaScript Closures",
-    topic: "JavaScript",
-    due: "Tomorrow",
-  },
-];
+import type { Question } from "../types/questions";
 
-const RevisionDue = () => {
+interface RevisionDueProps {
+  questions?: Question[];
+}
+
+const RevisionDue = ({
+  questions = [],
+}: RevisionDueProps) => {
+  const today = new Date();
+
+  today.setHours(0, 0, 0, 0);
+
+  const revisionQuestions = questions
+    .filter((question) => {
+      if (!question.revisionDate) {
+        return false;
+      }
+
+      const revisionDate = new Date(question.revisionDate);
+
+      revisionDate.setHours(0, 0, 0, 0);
+
+      return revisionDate <= today;
+    })
+    .slice(0, 5);
+
   return (
     <Box
       bg="white"
-      borderWidth="1px"
-      borderColor="gray.200"
-      borderRadius="xl"
       p="6"
-      shadow="sm"
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="gray.100"
     >
-      <Heading size="md" mb="6">
+      <Heading size="md" mb="5">
         Revision Due
       </Heading>
 
-      <VStack align="stretch" gap="4">
-        {revisions.map((item) => (
-          <Flex
-            key={item.title}
-            justify="space-between"
-            align="center"
-            gap="4"
-          >
-            <Box>
-              <Text fontWeight="medium">
-                {item.title}
-              </Text>
-
-              <Text
-                fontSize="sm"
-                color="gray.500"
-              >
-                {item.topic}
-              </Text>
-            </Box>
-
-            <Badge
-              colorPalette={
-                item.due === "Today"
-                  ? "red"
-                  : "orange"
-              }
+      {revisionQuestions.length === 0 ? (
+        <Text color="gray.500">
+          No revisions due 🎉
+        </Text>
+      ) : (
+        <Box>
+          {revisionQuestions.map((question) => (
+            <Flex
+              key={question._id}
+              justify="space-between"
+              align="center"
+              py="4"
+              borderBottomWidth="1px"
+              borderColor="gray.100"
+              gap="4"
             >
-              {item.due}
-            </Badge>
-          </Flex>
-        ))}
-      </VStack>
+              <Box>
+                <Text fontWeight="600">
+                  {question.title}
+                </Text>
+
+                <Text
+                  fontSize="sm"
+                  color="gray.500"
+                  mt="1"
+                >
+                  {question.topic}
+                </Text>
+              </Box>
+
+              <Badge colorPalette="red">
+                Due
+              </Badge>
+            </Flex>
+          ))}
+        </Box>
+      )}
     </Box>
   );
 };
